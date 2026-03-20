@@ -6,12 +6,13 @@ Inventory of **delivered work**: files in this repo, helper scripts, env wiring,
 
 | Layer | Status |
 | ----- | ------ |
-| **Backend** | FastAPI: **`POST /scan`** (full JSON + `remediation`, breakdown, evidence) and **`POST /scan/voiceflow`** (flat scalars for no-code clients). Same scan pipeline. |
-| **Voiceflow** | **Working pattern:** API block → `https://<ngrok-host>/scan/voiceflow` → headers `Content-Type: application/json` + `ngrok-skip-browser-warning: true` → body with `github_username` → **Capture** only top-level keys (`total_repos`, `top_issue_1`…`cleanup_repo_2`) — **not** `summary.*` or `top_issues.*`. Message block uses `{total_repos}`, `{showcase_ready}`, etc. |
-| **Local dev** | **uvicorn** on **8000** + **ngrok http 8000** must both run while testing from Voiceflow’s cloud. |
-| **Tests** | Pytest covers scan, voiceflow mapper, scoring, remediation, inspector (run: `.venv/bin/python -m pytest tests/ -q`). |
+| **Backend** | FastAPI: **`GET /`** (service index), **`GET /health`**, **`GET /docs`**, **`POST /scan`**, **`POST /scan/voiceflow`**. |
+| **Production API** | Example deploy: **Render** — `https://github-cleaner-api.onrender.com` (set **`GITHUB_TOKEN`** in Render env). Scan URL for agents: **`…/scan/voiceflow`**. See **[DEPLOY_RENDER.md](DEPLOY_RENDER.md)**. |
+| **Voiceflow (production)** | Published agent calls the **Render** URL (not ngrok). API block: **`POST https://github-cleaner-api.onrender.com/scan/voiceflow`**, `Content-Type: application/json`, body with `github_username` → **Capture** flat keys only. No `ngrok-skip-browser-warning` on Render. |
+| **Local + ngrok (dev)** | **uvicorn** on **8000** + **`ngrok http 8000`** when testing from Voiceflow against your laptop; use ngrok URL + `/scan/voiceflow` and the **ngrok-skip-browser-warning** header. |
+| **Tests** | `.venv/bin/python -m pytest tests/ -q` |
 
-**Next product step (see below):** deploy API so you are not tied to laptop + ngrok; then deeper inspection or LLM layer per roadmap.
+**Next product step:** Voiceflow **404/502** branches, API **timeout** for cold starts; then README content signals, persistence, or LLM — see **`EVALUATION_AND_NEXT_STEPS.md`**.
 
 ---
 
@@ -111,12 +112,13 @@ Nothing in git **is** the Voiceflow canvas; the **integration** is documented so
 | ✅  | Root **`structure_report`** on each repo; structure-linked issues / penalties / cap; inspect **max 40** repos per scan |
 | ✅  | **`score_breakdown`**, **`score_evidence`**, **`remediation`** on each `RepoResult`                     |
 | ✅  | **`POST /scan/voiceflow`** — flat response for no-code agents                                         |
-| ✅  | **Voiceflow E2E pattern** documented (`/scan/voiceflow`, flat capture, ngrok headers)                  |
+| ✅  | **Voiceflow E2E** — flat `/scan/voiceflow`, Render deploy, published agent (see **VOICEFLOW_AGENT.md**) |
+| ✅  | **API on Render** — stable HTTPS; **`GITHUB_TOKEN`** in host env |
 
 Voiceflow UI configuration is **outside** this repository; use **`VOICEFLOW_AGENT.md`** + **`PHASE_1.5_AGENT_PLAN.md`** to implement or verify it.
 
-### Suggested next steps (after Voiceflow works locally)
+### Suggested next steps
 
-1. **Deploy the API** — step-by-step for **Render**: **[DEPLOY_RENDER.md](DEPLOY_RENDER.md)** (or Railway/Fly similarly) — point Voiceflow at the stable HTTPS URL instead of ngrok.  
-2. **Polish the agent** — branches for 404/502, “list archive candidates”, optional timeout message.  
-3. **Product / backend** — README body fetch, scan persistence, or LLM explanation layer — see **`EVALUATION_AND_NEXT_STEPS.md`** / **`PROJECT_WORK_PLAN.md`**.
+1. **Agent polish** — Voiceflow branches for **404** (user not found), **502** (GitHub/API error); **raise API timeout** for Render cold start + large scans.  
+2. **Backend** — optional flat fields for showcase repos on `/scan/voiceflow`; README body fetch; scan persistence — see **`EVALUATION_AND_NEXT_STEPS.md`**.  
+3. **Ops** — keep Render service awake or accept first-hit delay; rotate tokens via Render **Environment** only.

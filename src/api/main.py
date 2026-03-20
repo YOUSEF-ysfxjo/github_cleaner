@@ -29,6 +29,18 @@ app = FastAPI(
 app.include_router(scan.router)
 
 
+@app.get("/")
+def root():
+    """Root URL — Render/browser checks; real API lives under /scan, /health, /docs."""
+    return {
+        "service": "github-cleaner",
+        "docs": "/docs",
+        "health": "/health",
+        "scan": "POST /scan",
+        "scan_voiceflow": "POST /scan/voiceflow",
+    }
+
+
 @app.get("/health")
 def health():
     """Health check for load balancers or agents."""

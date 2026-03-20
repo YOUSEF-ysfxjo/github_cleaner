@@ -11,7 +11,9 @@ Production-grade AI system that analyzes GitHub profiles, evaluates repository q
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) and [docs/MODULES.md](docs/MODULES.md). **Full project work plan (vision & phases 1–7):** [docs/PROJECT_WORK_PLAN.md](docs/PROJECT_WORK_PLAN.md). **Docs map:** [docs/README.md](docs/README.md).
 
-**Phase 1.5 — Voiceflow agent:** how to run the API, ngrok, and connect Voiceflow to `POST /scan` is documented in **[docs/VOICEFLOW_AGENT.md](docs/VOICEFLOW_AGENT.md)** (JSON contract: [docs/AGENT_INTEGRATION.md](docs/AGENT_INTEGRATION.md)).
+**Phase 1.5 — Voiceflow agent:** connect Voiceflow to **`POST /scan/voiceflow`** (flat JSON) or **`POST /scan`** (full JSON) — **[docs/VOICEFLOW_AGENT.md](docs/VOICEFLOW_AGENT.md)** · contract **[docs/AGENT_INTEGRATION.md](docs/AGENT_INTEGRATION.md)** · **deploy API (e.g. Render):** **[docs/DEPLOY_RENDER.md](docs/DEPLOY_RENDER.md)**.
+
+**Production example:** API at `https://github-cleaner-api.onrender.com` — Voiceflow uses `https://github-cleaner-api.onrender.com/scan/voiceflow`. Set **`GITHUB_TOKEN`** in Render’s environment.
 
 ## MVP (Phase 1)
 
@@ -41,7 +43,7 @@ PYTHONPATH=src uvicorn api.main:app --reload
 
 Or run from `src`: `uvicorn api.main:app --reload`
 
-POST `/scan` with JSON:
+POST **`/scan`** (full response) or **`/scan/voiceflow`** (flat fields for no-code tools) with JSON:
 
 ```json
 {
@@ -50,6 +52,13 @@ POST `/scan` with JSON:
   "scan_scope": "public"
 }
 ```
+
+- **`GET /`** — small JSON index (links to docs, health, scan paths).  
+- **`GET /docs`** — Swagger UI.
+
+## Deploy (Render)
+
+See **[docs/DEPLOY_RENDER.md](docs/DEPLOY_RENDER.md)**. After deploy, use **`https://<your-service>.onrender.com/scan/voiceflow`** in Voiceflow (not ngrok).
 
 ## Save scan result to JSON
 

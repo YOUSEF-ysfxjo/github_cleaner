@@ -2,6 +2,18 @@
 
 This is the **documented way** to run the backend and connect a **Voiceflow** (or similar) agent. Prefer **`POST /scan/voiceflow`** for a **flat** JSON (no nested `summary` / `repos` / arrays) — see **[AGENT_INTEGRATION.md](AGENT_INTEGRATION.md)**. Use **`POST /scan`** when you need the full payload.
 
+### Production (Render + published Voiceflow)
+
+| Item | Example |
+| ---- | -------- |
+| **Deployed API** | `https://github-cleaner-api.onrender.com` (your Render service URL) |
+| **Voiceflow API block URL** | `https://github-cleaner-api.onrender.com/scan/voiceflow` |
+| **Headers** | `Content-Type: application/json` only — **do not** send `ngrok-skip-browser-warning` (ngrok only). |
+| **Token** | Set **`GITHUB_TOKEN`** in the Render service **Environment** (not in git). |
+| **Publish** | In Voiceflow, **Publish** Development → Production when the prototype works. |
+
+Full deploy steps: **[DEPLOY_RENDER.md](DEPLOY_RENDER.md)**.
+
 ---
 
 ## Prerequisites
@@ -65,9 +77,10 @@ Or run `./scripts/check-ngrok.sh` while uvicorn and ngrok are up — it prints t
 | Setting | Value |
 |--------|--------|
 | **Method** | `POST` |
-| **URL** | `https://<your-ngrok-host>/scan/voiceflow` (full URL; no space; path is `/scan/voiceflow`) |
+| **URL (production)** | `https://<your-render-host>/scan/voiceflow` e.g. `https://github-cleaner-api.onrender.com/scan/voiceflow` |
+| **URL (local + ngrok)** | `https://<your-ngrok-host>/scan/voiceflow` |
 | **Headers** | `Content-Type: application/json` |
-| | `ngrok-skip-browser-warning: true` (avoids ngrok’s HTML interstitial on API calls) |
+| **Extra header (ngrok only)** | `ngrok-skip-browser-warning: true` — **omit on Render** |
 
 **Body (JSON),** e.g. (replace the username part with your Voiceflow variable if the editor uses `{{variable}}` or another syntax):
 
@@ -120,6 +133,7 @@ Same as above but URL ends with **`/scan`**. Map nested paths, e.g. `summary.tot
 | `502` + GitHub “Bad credentials” | Invalid `GITHUB_TOKEN` in `.env` or placeholder left in place. |
 | `502` + rate limit | Set a real token in `.env`, or wait and retry. |
 | Voiceflow “API tool failed”, curl works | Increase API block timeout; scan can take many seconds for large profiles. |
+| First request slow on Render free tier | **Cold start** — wait and retry, or raise Voiceflow timeout / use a paid Render instance. |
 
 ---
 
@@ -133,4 +147,6 @@ Same as above but URL ends with **`/scan`**. Map nested paths, e.g. `summary.tot
 
 ## Phase 1.5 success (this setup)
 
-With the API running, ngrok forwarding to **8000**, and Voiceflow calling `POST https://<ngrok-host>/scan/voiceflow` (flat) or `…/scan` (full) with the headers above, you have **one documented way** to run the agent against the running backend, as required by the Phase 1.5 plan.
+**Production:** API on **Render** (or similar) + Voiceflow calling `POST https://<your-host>/scan/voiceflow` with flat capture + **Publish** to Production.
+
+**Local dev:** uvicorn + **ngrok** to **8000** + same `/scan/voiceflow` path + `ngrok-skip-browser-warning` header.

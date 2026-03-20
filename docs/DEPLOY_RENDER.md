@@ -45,8 +45,11 @@ Your service URL will look like:
 `https://github-cleaner-api.onrender.com`  
 (exact name depends on what you chose.)
 
-- Open in browser: `https://YOUR-SERVICE.onrender.com/docs` — you should see Swagger.
-- Or: `GET https://YOUR-SERVICE.onrender.com/health` → `{"status":"ok"}`.
+- **`GET /`** — short JSON with links to `docs`, `health`, and scan paths (not an error).
+- **`GET /docs`** — Swagger UI.
+- **`GET /health`** → `{"status":"ok"}`.
+
+**Voiceflow** must call **`POST https://YOUR-SERVICE.onrender.com/scan/voiceflow`** (not `/` alone — that is not the scan endpoint).
 
 **Note (free tier):** The service **sleeps** after idle time. The **first** request after sleep can take **30–60+ seconds** (cold start). Voiceflow may time out unless you increase the API step timeout or use a paid plan that stays awake.
 

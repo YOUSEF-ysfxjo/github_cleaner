@@ -6,9 +6,9 @@ This document summarizes where the project stands versus the [PROJECT_WORK_PLAN]
 
 ## 1. Overall Verdict
 
-- **Current state:** Strong **Phase 1 MVP** backend + agent integration foundation; not yet the full system described in the Work Plan.
-- **Strengths:** Solid base, clear architecture, good docs, real implementation (API, scoring, Voiceflow path), read-only-by-design.
-- **Gap:** Today = repository audit from **metadata** + scoring + reporting + Voiceflow hookup. Not yet = full repository **content** inspection + deep AI review + safe auto-fix execution.
+- **Current state:** Strong **Phase 1 MVP** backend + **Voiceflow** agent on **`POST /scan/voiceflow`**, with **API deployed** (e.g. **Render** — see `DEPLOY_RENDER.md`). Not yet the full system in the Work Plan.
+- **Strengths:** Solid base, clear architecture, good docs, scoring + **score breakdown / evidence**, **remediation** on full scan, flat payload for no-code, read-only-by-design.
+- **Gap:** Still mainly **metadata + root listing** (not full **content** inspection), no LLM layer, no scan persistence, no auto-fix.
 
 ---
 
@@ -18,9 +18,9 @@ This document summarizes where the project stands versus the [PROJECT_WORK_PLAN]
 | ----- | ----------------- | ------ | ----- |
 | **1 — Repository Discovery** | Connect to GitHub API, fetch metadata, store list, extract attributes | **Done** | GitHubClient, fetch_repos_for_user, RepoDTO, POST /scan, summary, classification, token, public/all. |
 | **2 — Repository Structure Analysis** | Clone repos, scan directory structure, detect important files (README, LICENSE, deps, docs/) | **Not done** | Current analysis is metadata-based (e.g. README existence via API). No cloning, no file-tree or content inspection. ~10–20% if only surface file checks exist. |
-| **3 — Quality Evaluation Engine** | Multi-dimensional scoring (documentation, structure, maintenance, security) | **MVP done, ~60%** | Single 0–100 score, classification, issues, suggestions exist. Missing: dimension breakdown (doc/structure/maintenance/safety), evidence per signal, richer heuristics. |
+| **3 — Quality Evaluation Engine** | Multi-dimensional scoring (documentation, structure, maintenance, security) | **MVP done, ~70%** | 0–100 score + **`ScoreBreakdown`** + **`score_evidence`**, classification, issues, suggestions. Still: richer heuristics, true “safety” dimension, README content. |
 | **4 — AI Review Layer** | LLM uses metadata + structure + quality → intelligent, contextual recommendations | **Not implemented** | Current behavior is rule-based/templated (e.g. “add license”, “add README”). No LLM reading README or project type, no tailored suggestions. |
-| **5 — Cleanup Recommendation Engine** | Classify repos (Public Ready, Needs Cleanup, Archive, etc.) + remediation plan per class | **Partially done, ~65%** | Showcase / cleanup / archive classification works. Missing: finer categories, per-repo action plans, priority and effort. |
+| **5 — Cleanup Recommendation Engine** | Classify repos + remediation plan per repo | **~75%** | Classification + per-repo **`remediation`** (blockers, quick wins, order, effort, publish readiness). Flat Voiceflow payload names top cleanup/archive repos. Finer categories / LLM narrative still open. |
 | **6 — Optional Auto-Fix Tools** | Generate README/.gitignore/LICENSE, remove temp files; all with user approval | **Intentionally deferred** | Read-only MVP; no write endpoints. Correct for current stage. |
 | **7 — Report Generation** | Full account audit, totals by category, score/issues per repo | **Done for MVP** | Summary, top_issues, repos list, recommended_next_step, save-to-JSON. Possible later: markdown/PDF/HTML export, dashboard, scan history. |
 
@@ -31,14 +31,14 @@ This document summarizes where the project stands versus the [PROJECT_WORK_PLAN]
 1. **Analysis is still shallow**  
    Audit is metadata-first. Need move from **profile audit** to **repository content audit** (files, structure, README content, risk signals).
 
-2. **No clear evidence per judgment**  
-   For each classification/score, users need: why, which signals, which rules. Add factors, penalties, evidence snippets.
+2. **Evidence could go further**  
+   **`score_evidence`** and **`score_breakdown`** exist on **`POST /scan`**; Voiceflow flat path does not expose them yet. Next: richer snippets (e.g. README quotes) or optional flat fields.
 
-3. **Single aggregate score can be misleading**  
-   One number hides dimensions. Add sub-scores (e.g. Documentation, Structure, Maintenance, Safety, Portfolio fit) then total.
+3. **Dimensions vs one headline score**  
+   Breakdown dimensions exist in API; agent copy can stress them more. Safety dimension still thin.
 
-4. **No real remediation engine**  
-   Suggestions exist but not **action plans**: quick wins vs blockers, order of work, estimated effort, publish status per repo.
+4. **Remediation depth**  
+   **`remediation`** on full scan is rule-based; no per-repo LLM narrative or user-chosen “fix plan for repo X” in Voiceflow yet.
 
 5. **Agent is not interactive enough**  
    Flow is: username → /scan → summary. Missing: “Which 3 repos to fix first?”, “Why is this not showcase-ready?”, “Cleanup plan for repo X”, “Only security issues”, etc.

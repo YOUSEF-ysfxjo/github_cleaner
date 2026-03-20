@@ -32,5 +32,6 @@ Use this page to see **which file to open** and how phases relate.
 | **[TASKS.md](TASKS.md)**                                           | Phase 2 inspector checklist (mostly done)                                                                                |
 | **[TASKS_STRUCTURE_TO_SCORING.md](TASKS_STRUCTURE_TO_SCORING.md)** | **Next tasks** — plain English + steps: use `structure_report` in issues → suggestions → score, then breakdown / plans   |
 | **[TASKS_SCORE_BREAKDOWN.md](TASKS_SCORE_BREAKDOWN.md)**           | **Priority 2 checklist** — `ScoreBreakdown`, `score_evidence`, `scorer` refactor, aggregator, tests, `AGENT_INTEGRATION` |
+| **[TASKS_REMEDIATION.md](TASKS_REMEDIATION.md)**                     | Remediation plan — pointers to `remediation.py`, contracts, tests (implemented)                                         |
 
 **Suggested order:** new to code → `START_HERE.md` · wiring an agent → `AGENT_INTEGRATION.md` → `VOICEFLOW_AGENT.md` · inventory → `BUILD_SUMMARY.md`.

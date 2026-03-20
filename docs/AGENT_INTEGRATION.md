@@ -2,9 +2,11 @@
 
 The backend is **read-only** and stateless. The agent (Voiceflow, custom LLM, or any client) calls the API and explains results to the user.
 
+**Production example:** `https://github-cleaner-api.onrender.com` — use **`POST …/scan/voiceflow`** for Voiceflow (flat JSON). **Local:** `http://127.0.0.1:8000`.
+
 ## API contract
 
-- **Base URL**: `http://localhost:8000` (or your deployment URL)
+- **Base URL**: `http://localhost:8000` (local) or your **Render / other host** HTTPS URL
 - **Health**: `GET /health` → `{"status": "ok"}`
 
 ### Scan endpoint

@@ -8,11 +8,12 @@ This document defines the official next phase: a **minimal agent** that collects
 
 | Piece | Where it lives | Status |
 | ----- | -------------- | ------ |
-| Backend `POST /scan` | This repo | **Done** (Phase 1) |
+| Backend `POST /scan` + `POST /scan/voiceflow` | This repo | **Done** |
+| Deploy API (e.g. Render) | Host env + `docs/DEPLOY_RENDER.md` | **Done** (example: `github-cleaner-api.onrender.com`) |
 | JSON contract & errors | `docs/AGENT_INTEGRATION.md` | **Done** |
-| How to run API + ngrok + Voiceflow headers | `docs/VOICEFLOW_AGENT.md` | **Done** |
-| README pointer to agent docs | `README.md` | **Done** |
-| **Voiceflow project** (inputs, API block, copy, follow-ups, 4xx/5xx handling) | Voiceflow (cloud), not git | **You** finish or iterate |
+| Voiceflow runbook (Render + ngrok dev) | `docs/VOICEFLOW_AGENT.md` | **Done** |
+| README pointer to agent + deploy docs | `README.md` | **Done** |
+| **Voiceflow project** (API → `/scan/voiceflow`, capture, copy, **Publish**) | Voiceflow (cloud), not git | **Done** for core path; optional: 404/502 branches |
 | **Option B** — CLI / Streamlit client | Optional; could live in this repo | **Not** added unless you build it |
 
 **Navigation hub for all docs:** [`docs/README.md`](README.md).
@@ -24,8 +25,8 @@ This document defines the official next phase: a **minimal agent** that collects
 - **Phase 1.5**: Agent Integration
 - **Scope**: One simple agent that:
   1. Collects 3 inputs from the user.
-  2. Calls `POST /scan`.
-  3. Reads `ScanResponse`.
+  2. Calls `POST /scan` or **`POST /scan/voiceflow`** (flat fields for Voiceflow).
+  3. Reads the JSON response (full `ScanResponse` or flat voiceflow shape).
   4. Explains the result in plain language.
   5. Suggests a next step and offers follow-up options.
 

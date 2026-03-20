@@ -138,3 +138,17 @@ def test_scan_inspects_at_most_max_repos(mock_fetch, mock_inspect, client):
     assert mock_inspect.call_count == MAX_REPOS_TO_INSPECT
     assert data["repos"][MAX_REPOS_TO_INSPECT - 1]["structure_report"] is not None
     assert data["repos"][MAX_REPOS_TO_INSPECT]["structure_report"] is None
+
+
+def test_root_lists_entrypoints(client):
+    r = client.get("/")
+    assert r.status_code == 200
+    data = r.json()
+    assert data["service"] == "github-cleaner"
+    assert "scan_voiceflow" in data
+
+
+def test_health_ok(client):
+    r = client.get("/health")
+    assert r.status_code == 200
+    assert r.json() == {"status": "ok"}

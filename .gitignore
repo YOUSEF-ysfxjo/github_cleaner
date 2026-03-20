@@ -1,0 +1,22 @@
+# Local secrets — never commit
+.env
+
+# Local scratch / exports (not part of the app)
+tmp_*.md
+
+# macOS
+.DS_Store
+
+# Generated scan output (keep output/ via .gitkeep only)
+output/*.json
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+dist/
+build/

@@ -10,6 +10,9 @@ tmp_*.md
 # Generated scan output (keep output/ via .gitkeep only)
 output/*.json
 
+# Streamlit (local)
+.streamlit/secrets.toml
+
 # Python
 .venv/
 __pycache__/

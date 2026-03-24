@@ -56,6 +56,18 @@ POST **`/scan`** (full response) or **`/scan/voiceflow`** (flat fields for no-co
 - **`GET /`** — small JSON index (links to docs, health, scan paths).  
 - **`GET /docs`** — Swagger UI.
 
+## Streamlit demo (free UI, no Voiceflow)
+
+Calls the same **`POST /scan/voiceflow`** as the hosted API (default: Render). Runs on your machine; uses **httpx** server-side (no CORS issues).
+
+```bash
+source .venv/bin/activate
+pip install -e ".[demo]"
+streamlit run streamlit_app.py
+```
+
+Then open the URL Streamlit prints (usually `http://localhost:8501`). Set **API base URL** in the sidebar if your API is not on Render.
+
 ## Deploy (Render)
 
 See **[docs/DEPLOY_RENDER.md](docs/DEPLOY_RENDER.md)**. After deploy, use **`https://<your-service>.onrender.com/scan/voiceflow`** in Voiceflow (not ngrok).

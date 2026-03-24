@@ -25,6 +25,7 @@ Use this page to see **which file to open** and how phases relate.
 | **[PHASE_1.5_AGENT_PLAN.md](PHASE_1.5_AGENT_PLAN.md)**             | Phase 1.5 spec, checklist, success criteria                                                                              |
 | **[VOICEFLOW_AGENT.md](VOICEFLOW_AGENT.md)**                       | Run API, ngrok, Voiceflow; **§4** = timeout + failure paths + error copy (EN/AR)                                          |
 | **[DEPLOY_RENDER.md](DEPLOY_RENDER.md)**                           | **Deploy API on Render** → stable URL for Voiceflow (no ngrok)                                                           |
+| **Streamlit** (`streamlit_app.py` at repo root)                    | Free local UI: `pip install -e ".[demo]"` then `streamlit run streamlit_app.py` — see main **README.md**                  |
 | **[SETUP_UV.md](SETUP_UV.md)**                                     | uv / optional tooling                                                                                                    |
 | **[BUILD_SUMMARY.md](BUILD_SUMMARY.md)**                           | **What we’ve built** (files + documented Voiceflow path)                                                                 |
 | **[PROJECT_WORK_PLAN.md](PROJECT_WORK_PLAN.md)**                   | **North-star work plan** — full vision (phases 1–7, safety, extensions) vs current repo                                  |

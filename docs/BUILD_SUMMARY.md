@@ -54,6 +54,7 @@ Inventory of **delivered work**: files in this repo, helper scripts, env wiring,
 | Path                         | What it does                                                                      |
 | ---------------------------- | --------------------------------------------------------------------------------- |
 | **scripts/scan-and-save.sh** | `POST /scan` for a username; writes pretty JSON to **`output/scan_<user>.json`**. |
+| **`streamlit_app.py`** (root) | Optional **Streamlit** UI → `POST /scan/voiceflow`; install with **`pip install -e ".[demo]"`**. |
 | **scripts/check-ngrok.sh**   | Checks local `/health` and ngrok’s public URL (when tunnel is up).                |
 | **output/.gitkeep**          | Keeps `output/` in git; scan JSON files are local artifacts.                      |
 

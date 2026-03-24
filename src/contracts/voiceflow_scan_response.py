@@ -30,6 +30,9 @@ class VoiceflowScanResponse(BaseModel):
     cleanup_repo_1: str = ""
     cleanup_repo_2: str = ""
 
+    showcase_repo_1: str = ""
+    showcase_repo_2: str = ""
+
 
 def _fill_slots(values: list[str], count: int) -> list[str]:
     out = list(values[:count])
@@ -50,8 +53,14 @@ def build_voiceflow_scan_response(scan: ScanResponse) -> VoiceflowScanResponse:
     cleanup_repos = [r for r in scan.repos if r.classification == Classification.CLEANUP]
     cleanup_repos.sort(key=lambda r: r.score)
     cleanup_names = [r.name for r in cleanup_repos]
+
+    showcase_repos = [r for r in scan.repos if r.classification == Classification.SHOWCASE]
+    showcase_repos.sort(key=lambda r: r.score, reverse=True)
+    showcase_names = [r.name for r in showcase_repos]
+
     arch = _fill_slots(archive_names, 2)
     clean = _fill_slots(cleanup_names, 2)
+    show = _fill_slots(showcase_names, 2)
 
     return VoiceflowScanResponse(
         total_repos=s.total_repos,
@@ -66,4 +75,6 @@ def build_voiceflow_scan_response(scan: ScanResponse) -> VoiceflowScanResponse:
         archive_repo_2=arch[1],
         cleanup_repo_1=clean[0],
         cleanup_repo_2=clean[1],
+        showcase_repo_1=show[0],
+        showcase_repo_2=show[1],
     )

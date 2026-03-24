@@ -121,5 +121,5 @@ Voiceflow UI configuration is **outside** this repository; use **`VOICEFLOW_AGEN
 ### Suggested next steps
 
 1. **Agent polish** — Step-by-step in **`VOICEFLOW_AGENT.md` §4** (timeout 90–120s, failure path, copy-paste messages EN/AR). **You** wire it in the Voiceflow canvas (not in git).  
-2. **Backend** — optional flat fields for showcase repos on `/scan/voiceflow`; README body fetch; scan persistence — see **`EVALUATION_AND_NEXT_STEPS.md`**.  
+2. **Backend** — README body fetch; scan persistence — see **`EVALUATION_AND_NEXT_STEPS.md`**.  
 3. **Ops** — keep Render service awake or accept first-hit delay; rotate tokens via Render **Environment** only.

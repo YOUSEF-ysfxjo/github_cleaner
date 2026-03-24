@@ -104,16 +104,18 @@ Example:
   "archive_repo_1": "old-fork",
   "archive_repo_2": "empty-prototype",
   "cleanup_repo_1": "needs-readme",
-  "cleanup_repo_2": "short-desc"
+  "cleanup_repo_2": "short-desc",
+  "showcase_repo_1": "best-project",
+  "showcase_repo_2": "next-best"
 }
 ```
 
-Empty slots use `""`. **`archive_repo_*` / `cleanup_repo_*`** are filled with repo **names** (lowest score first within each classification). Same errors as `POST /scan`.
+Empty slots use `""`. **`archive_repo_*` / `cleanup_repo_*`** are filled with repo **names** (lowest score first within each classification). **`showcase_repo_*`** are the **highest-scoring** showcase repos (best first). Same errors as `POST /scan`.
 
 ## Agent behavior rules
 
 1. **No destructive actions** — Do not call any endpoint that modifies GitHub (there are none in MVP). Do not tell the user you will archive/rename/edit repos; only suggest and explain.
-2. **Explain from data** — For `POST /scan`, use `summary`, `top_issues`, `repos[].issues`, `repos[].suggestions`, and `recommended_next_step`. For `POST /scan/voiceflow`, use the flat `total_repos`, `top_issue_1..3`, `recommended_next_step`, and named repo slots. Do not invent scores or issues.
+2. **Explain from data** — For `POST /scan`, use `summary`, `top_issues`, `repos[].issues`, `repos[].suggestions`, and `recommended_next_step`. For `POST /scan/voiceflow`, use the flat `total_repos`, `top_issue_1..3`, `recommended_next_step`, `showcase_repo_1..2`, and cleanup/archive repo slots. Do not invent scores or issues.
 3. **Prioritize** — Use `classification` and `score` to order what to talk about (e.g. showcase first, then cleanup, then archive).
 4. **Confirm scope** — Before calling `/scan`, confirm username and whether they want public-only or all repos (if they have a token).
 

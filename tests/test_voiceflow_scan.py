@@ -118,6 +118,35 @@ def test_build_voiceflow_scan_response_flattens_summary_and_slots():
     assert flat.archive_repo_2 == "y-archive"
     assert flat.cleanup_repo_1 == "c-clean"
     assert flat.cleanup_repo_2 == "d-clean"
+    assert flat.showcase_repo_1 == "show"
+    assert flat.showcase_repo_2 == ""
+
+
+def test_showcase_slots_highest_score_first():
+    scan = ScanResponse(
+        summary=Summary(total_repos=2, showcase_ready=2, needs_cleanup=0, archive_candidates=0),
+        top_issues=[],
+        repos=[
+            RepoResult(
+                name="second",
+                score=70.0,
+                classification=Classification.SHOWCASE,
+                issues=[],
+                suggestions=[],
+            ),
+            RepoResult(
+                name="first",
+                score=95.0,
+                classification=Classification.SHOWCASE,
+                issues=[],
+                suggestions=[],
+            ),
+        ],
+        recommended_next_step="",
+    )
+    flat = build_voiceflow_scan_response(scan)
+    assert flat.showcase_repo_1 == "first"
+    assert flat.showcase_repo_2 == "second"
 
 
 def _two_sample_repos() -> list[RepoDTO]:
@@ -178,4 +207,6 @@ def test_scan_voiceflow_returns_flat_json(mock_fetch, mock_inspect):
     assert "top_issue_1" in data
     assert "archive_repo_1" in data
     assert "cleanup_repo_1" in data
+    assert "showcase_repo_1" in data
+    assert "showcase_repo_2" in data
     assert "recommended_next_step" in data

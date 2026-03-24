@@ -119,6 +119,12 @@ def _render_success(data: dict) -> None:
         if text:
             st.markdown(f"{i}. {text}")
 
+    st.subheader("Showcase highlights (highest scores)")
+    for k in ("showcase_repo_1", "showcase_repo_2"):
+        v = (data.get(k) or "").strip()
+        if v:
+            st.markdown(f"- `{v}`")
+
     st.subheader("Repos to prioritize")
     c1, c2 = st.columns(2)
     with c1:

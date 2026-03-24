@@ -92,7 +92,7 @@ Or run `./scripts/check-ngrok.sh` while uvicorn and ngrok are up — it prints t
 }
 ```
 
-**Capture response (map to variables):** the JSON has **no** nested `summary` — use top-level keys only, e.g. `total_repos`, `showcase_ready`, `needs_cleanup`, `archive_candidates`, `top_issue_1`, `top_issue_2`, `top_issue_3`, `recommended_next_step`, `archive_repo_1`, `archive_repo_2`, `cleanup_repo_1`, `cleanup_repo_2`. See **[AGENT_INTEGRATION.md](AGENT_INTEGRATION.md)** for the full list and error codes (**400 / 404 / 502**).
+**Capture response (map to variables):** the JSON has **no** nested `summary` — use top-level keys only, e.g. `total_repos`, `showcase_ready`, `needs_cleanup`, `archive_candidates`, `top_issue_1`, `top_issue_2`, `top_issue_3`, `recommended_next_step`, `archive_repo_1`, `archive_repo_2`, `cleanup_repo_1`, `cleanup_repo_2`, `showcase_repo_1`, `showcase_repo_2` (highest-scoring showcase repos). See **[AGENT_INTEGRATION.md](AGENT_INTEGRATION.md)** for the full list and error codes (**400 / 404 / 502**).
 
 **Remove** any old mappings like `summary.total_repos` or `top_issues.0` — those only match **`/scan`**, not **`/scan/voiceflow`**.
 
@@ -111,6 +111,8 @@ Most common issues:
 1. {top_issue_1}
 2. {top_issue_2}
 3. {top_issue_3}
+
+Pin these on your profile if you can: {showcase_repo_1}, {showcase_repo_2}
 
 Repos to prioritize for cleanup: {cleanup_repo_1}, {cleanup_repo_2}
 Repos to consider archiving: {archive_repo_1}, {archive_repo_2}

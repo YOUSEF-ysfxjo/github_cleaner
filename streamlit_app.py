@@ -16,8 +16,40 @@ import streamlit as st
 DEFAULT_API_BASE = "https://github-cleaner-api.onrender.com"
 
 
+def _normalize_api_base(raw: str) -> str:
+    """Fix common typo: ...onrender without .com breaks requests."""
+    s = raw.strip().rstrip("/")
+    if s.endswith(".onrender") and not s.endswith(".onrender.com"):
+        s = f"{s}.com"
+    return s
+
+
 def _scan_url(base: str) -> str:
     return f"{base.rstrip('/')}/scan/voiceflow"
+
+
+def _format_api_error(resp: httpx.Response) -> str:
+    """Avoid dumping full Render/HTML error pages into the UI."""
+    code = resp.status_code
+    text = (resp.text or "").strip()
+
+    if text.startswith("<!") or text[:200].lower().lstrip().startswith("<html"):
+        return (
+            f"**Error {code}** — الطرفية رجّعت صفحة HTML (غالبًا من Render أو البروكسي)، مو JSON.\n\n"
+            "**جرّب:** انتظر دقيقة أو دقيقتين ثم اضغط Run scan مرة ثانية (السيرفر المجاني ينام). "
+            "تأكد أن **API base URL** ينتهي بـ `.onrender.com` بالكامل.\n\n"
+            "**On Render:** افتح **Logs** للخدمة؛ تأكد أن **`GITHUB_TOKEN`** مضبوط إذا GitHub يرفض الطلبات."
+        )
+
+    try:
+        err = resp.json()
+        detail = err.get("detail", text)
+        if isinstance(detail, list):
+            detail = json.dumps(detail, indent=2)
+        return f"**Error {code}**\n\n{detail}"
+    except Exception:
+        short = text[:600] + ("…" if len(text) > 600 else "")
+        return f"**Error {code}**\n\n{short}"
 
 
 def main() -> None:
@@ -36,9 +68,12 @@ def main() -> None:
         api_base = st.text_input(
             "API base URL",
             value=DEFAULT_API_BASE,
-            help="No trailing path — e.g. https://github-cleaner-api.onrender.com",
+            help="Must include `.com` — e.g. https://github-cleaner-api.onrender.com (no `/scan` here).",
         )
         timeout_s = st.slider("Request timeout (seconds)", 30, 180, 120, 5)
+        norm = _normalize_api_base(api_base)
+        if norm != api_base.strip().rstrip("/"):
+            st.info(f"Using normalized URL: `{norm}`")
 
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -58,6 +93,7 @@ def main() -> None:
         st.warning("Enter a GitHub username.")
         return
 
+    api_base = _normalize_api_base(api_base)
     url = _scan_url(api_base)
     payload = {
         "github_username": u,
@@ -85,23 +121,31 @@ def main() -> None:
             st.code(json.dumps(data, indent=2), language="json")
         return
 
-    # Error responses from FastAPI
-    try:
-        err = resp.json()
-        detail = err.get("detail", resp.text)
-        if isinstance(detail, list):
-            detail = json.dumps(detail, indent=2)
-    except Exception:
-        detail = resp.text or str(resp.status_code)
-
     if resp.status_code == 404:
+        try:
+            err = resp.json()
+            detail = err.get("detail", resp.text)
+        except Exception:
+            detail = resp.text
         st.error(f"**User not found** (404)\n\n{detail}")
     elif resp.status_code == 400:
+        try:
+            err = resp.json()
+            detail = err.get("detail", resp.text)
+        except Exception:
+            detail = resp.text
         st.error(f"**Bad request** (400)\n\n{detail}")
     elif resp.status_code == 422:
+        try:
+            err = resp.json()
+            detail = err.get("detail", resp.text)
+            if isinstance(detail, list):
+                detail = json.dumps(detail, indent=2)
+        except Exception:
+            detail = resp.text
         st.error(f"**Invalid input** (422)\n\n{detail}")
     else:
-        st.error(f"**Error {resp.status_code}**\n\n{detail}")
+        st.error(_format_api_error(resp))
 
 
 def _render_success(data: dict) -> None:

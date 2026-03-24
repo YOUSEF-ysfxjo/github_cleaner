@@ -71,10 +71,16 @@ The backend is **read-only** and stateless. The agent (Voiceflow, custom LLM, or
 
 Each `repos[]` item may include **`structure_report`**: root-level file/folder evidence from the GitHub Contents API (`has_files`, `has_folders`, `has_files_and_folders`). It is **`null`** if inspection failed for that repo, or if the repo is beyond the server’s inspection limit (first **40** repos per scan are inspected; all repos are still scored). The scan still succeeds for the full repo list.
 
-- **Errors**:
-  - `400`: Invalid body or `scan_scope: "all"` without token
-  - `404`: GitHub user not found
-  - `502`: GitHub API error
+- **Errors** (JSON body is always an object with a **`detail`** field unless noted):
+
+| Code | When | Example body |
+| ---- | ---- | ------------- |
+| **400** | Invalid request or `scan_scope: "all"` without `GITHUB_TOKEN` on the server | `{"detail": "scan_scope 'all' requires GITHUB_TOKEN to be set"}` |
+| **404** | GitHub has no user for that username (public lookup) | `{"detail": "GitHub user not found"}` |
+| **422** | Pydantic validation (bad JSON shape, empty username, etc.) | `{"detail": [ { "loc": [...], "msg": "...", "type": "..." } ]}` — **`detail` is a list** here |
+| **502** | GitHub API failure, rate limit, bad token, network, etc. | `{"detail": "GitHub API error: ..."}` |
+
+Use **`detail`** in no-code tools: if it’s a **string**, show it to the user or map it to a friendly message. If **`detail`** is an **array** (422), show a generic “check username and JSON body” message.
 
 ### Voiceflow / no-code: flat response
 

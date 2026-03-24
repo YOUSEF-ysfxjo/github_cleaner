@@ -124,7 +124,93 @@ Same as above but URL ends with **`/scan`**. Map nested paths, e.g. `summary.tot
 
 ---
 
-## 4. Troubleshooting (short)
+## 4. Production polish — API timeout & failure paths (Voiceflow)
+
+The canvas lives in Voiceflow; labels (**Timeout**, **Failure path**, **Catch errors**) may vary slightly by product version. Goal: **long timeout** + **separate messages** for “user not found” vs “GitHub/server problem”.
+
+### 4.1 Increase timeout
+
+Scans can take **15–60+ seconds** (many repos + GitHub + structure checks). On **Render free tier**, the **first** request after sleep can add **30–90 seconds** (cold start).
+
+| Where | Suggested value |
+| ----- | ---------------- |
+| API / Integration block → **Timeout** (or **Advanced**) | **90 seconds** minimum; **120 seconds** if the UI allows it |
+
+If Voiceflow only offers a preset, pick the **largest** available for this block.
+
+### 4.2 Turn on the failure branch
+
+1. Open the same **API** block that calls `/scan/voiceflow`.
+2. Find **Failure path**, **On error**, **Catch errors**, or a **second output port** from the API block (not the success path).
+3. **Enable** it so failed HTTP responses and timeouts go to a **separate** path on the canvas — do **not** send the user to the “scan results” text block on that path.
+
+### 4.3 Map error `detail` (optional)
+
+On error, FastAPI returns JSON such as:
+
+```json
+{"detail": "GitHub user not found"}
+```
+
+If Voiceflow lets you **capture variables from the error response**, map **`detail`** → e.g. `api_error_detail`. Then use conditions below. If you cannot map it, use a **single** generic error message (section 4.5).
+
+### 4.4 Branch on status code (if available)
+
+Some builders expose **HTTP status** (e.g. `status_code`, `response_code`). Use:
+
+| Status | Meaning | Next step on canvas |
+| ------ | -------- | --------------------- |
+| **404** | Username not found on GitHub | Message block: “user not found” (copy below) |
+| **400** | Bad request / `scan_scope: all` without server token | Explain public-only or contact admin |
+| **422** | Bad body (e.g. empty username) | Ask user to enter a valid username |
+| **502** | GitHub or server error | “Temporary problem” message + retry |
+| **Timeout / no status** | Render cold start or overload | Same as 502 — ask user to **retry once** after ~1 minute |
+
+### 4.5 Copy-paste messages (English)
+
+Use these in **Text / Speak** blocks on the **failure** path.
+
+**404 — user not found**
+
+```text
+I couldn't find a GitHub user with that username. Check the spelling (case doesn't matter) and try again.
+```
+
+**502 / timeout / generic server**
+
+```text
+Something went wrong while talking to GitHub, or the scan took too long. If this is the first try in a while, wait a minute and try again — the server may be waking up. Otherwise try again in a few minutes.
+```
+
+**400 — private scan without token**
+
+```text
+Scanning private repositories isn't available on this deployment. Try again with public repositories only, or ask the admin to configure the server token.
+```
+
+**422 — validation**
+
+```text
+That input wasn't accepted. Please enter a non-empty GitHub username and try again.
+```
+
+### 4.6 نصوص جاهزة (عربي) — اختياري
+
+**404**
+
+```text
+ما لقيت مستخدم GitHub بهذا الاسم. تأكد من الإملاء وحاول مرة ثانية.
+```
+
+**502 / انتهاء الوقت**
+
+```text
+صار خطأ أثناء الاتصال بـ GitHub أو طال وقت الاستجابة. إذا كانت أول محاولة من زمان، انتظر دقيقة وحاول مرة ثانية (السيرفر قد يكون يستيقظ). وإلا حاول بعد شوي.
+```
+
+---
+
+## 5. Troubleshooting (short)
 
 | Symptom | Likely cause |
 |--------|----------------|
@@ -137,7 +223,7 @@ Same as above but URL ends with **`/scan`**. Map nested paths, e.g. `summary.tot
 
 ---
 
-## 5. Related docs
+## 6. Related docs
 
 - **[AGENT_INTEGRATION.md](AGENT_INTEGRATION.md)** — `POST /scan` request/response JSON, errors, agent behavior.
 - **[PHASE_1.5_AGENT_PLAN.md](PHASE_1.5_AGENT_PLAN.md)** — Phase 1.5 goals and checklist.
@@ -145,7 +231,7 @@ Same as above but URL ends with **`/scan`**. Map nested paths, e.g. `summary.tot
 
 ---
 
-## Phase 1.5 success (this setup)
+## Phase 1.5 success (this setup + polish)
 
 **Production:** API on **Render** (or similar) + Voiceflow calling `POST https://<your-host>/scan/voiceflow` with flat capture + **Publish** to Production.
 

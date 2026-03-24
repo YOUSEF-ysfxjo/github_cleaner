@@ -23,7 +23,7 @@ Use this page to see **which file to open** and how phases relate.
 | **[MODULES.md](MODULES.md)**                                       | Module boundaries                                                                                                        |
 | **[AGENT_INTEGRATION.md](AGENT_INTEGRATION.md)**                   | **JSON contract** for `POST /scan`                                                                                       |
 | **[PHASE_1.5_AGENT_PLAN.md](PHASE_1.5_AGENT_PLAN.md)**             | Phase 1.5 spec, checklist, success criteria                                                                              |
-| **[VOICEFLOW_AGENT.md](VOICEFLOW_AGENT.md)**                       | Run API, ngrok, Voiceflow headers                                                                                        |
+| **[VOICEFLOW_AGENT.md](VOICEFLOW_AGENT.md)**                       | Run API, ngrok, Voiceflow; **§4** = timeout + failure paths + error copy (EN/AR)                                          |
 | **[DEPLOY_RENDER.md](DEPLOY_RENDER.md)**                           | **Deploy API on Render** → stable URL for Voiceflow (no ngrok)                                                           |
 | **[SETUP_UV.md](SETUP_UV.md)**                                     | uv / optional tooling                                                                                                    |
 | **[BUILD_SUMMARY.md](BUILD_SUMMARY.md)**                           | **What we’ve built** (files + documented Voiceflow path)                                                                 |

@@ -66,6 +66,7 @@ Collect exactly three values (from chat, form, or config):
   - **400**: e.g. `scan_scope: "all"` without token — tell user to use `public` or set token.
   - **404**: User not found — tell user to check the username.
   - **502**: GitHub/network error — tell user to retry or check token/network.
+  - **Timeout / Voiceflow**: Set a **long API timeout** (90–120s) and a **failure path** with user-friendly copy — see **`VOICEFLOW_AGENT.md` §4**.
 
 ### 3. Response explanation
 
